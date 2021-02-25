@@ -92,11 +92,11 @@ module "was_sg" {
 
   # http
   ingress_rules       = ["http-80-tcp"]
-  # ingress_cidr_blocks = ["${module.alb_sg.this_security_group_id}"]
-  ingress_with_source_security_group_id = ["${module.alb_sg.this_security_group_id}"]
+  ingress_cidr_blocks = ["${module.alb_sg.this_security_group_id}"]
+  # ingress_with_source_security_group_id = ["${module.alb_sg.this_security_group_id}"]
   
-  # computed_ingress_cidr_blocks           = ["${module.vpc.vpc_cidr_block}"]
-  # number_of_computed_ingress_cidr_blocks = 1
+  computed_ingress_cidr_blocks           = ["${local.vpc_cidr_block}"]
+  number_of_computed_ingress_cidr_blocks = 1
 }
 
 
