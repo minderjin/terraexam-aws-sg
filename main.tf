@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 module "web_sg" {
-   source = "terraform-aws-modules/security-group/aws/modules/http-80"
+   source = "terraform-aws-modules/security-group/aws//modules/http-80"
 #   source = "terraform-aws-modules/terraform-aws-security-group/modules/http-80"
 
   name        = "web-server"
