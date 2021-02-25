@@ -11,6 +11,7 @@ data "aws_security_group" "default" {
 
 locals {
   vpc_id = "vpc-04bc8955784f0fa6d"
+  vpc_cidr_block = "10.0.0.0/16"
 }
 
 module "web_sg" {
@@ -47,11 +48,41 @@ module "custom_sg" {
       to_port     = 8090
       protocol    = "tcp"
       description = "Custom ports"
-      cidr_blocks = "10.0.0.0/16"
+      cidr_blocks = local.vpc_cidr_block
     },
     {
       rule        = "postgresql-tcp"
-      cidr_blocks = "10.0.0.0/16"
+      cidr_blocks = local.vpc_cidr_block
+    },
+  ]
+}
+
+
+module "mysql_sg" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = "mysql"
+  description = "${var.name} Security group for mysql ports"
+  vpc_id      = local.vpc_id
+
+
+  # https
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_rules       = ["mysql-tcp"]
+
+
+  # custom port & postgresql
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 8080
+      to_port     = 8090
+      protocol    = "tcp"
+      description = "Custom ports"
+      cidr_blocks = local.vpc_cidr_block
+    },
+    {
+      rule        = "postgresql-tcp"
+      cidr_blocks = local.vpc_cidr_block
     },
   ]
 }
