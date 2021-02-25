@@ -19,6 +19,26 @@ module "web_sg" {
 
 }
 
-# module "custom_sg" {
-    
-# }
+module "custom_sg" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = "custom"
+  description = "${var.name} Security group for custom ports"
+  vpc_id      = "vpc-04bc8955784f0fa6d"
+
+  ingress_cidr_blocks      = ["10.0.0.0/16"]
+  ingress_rules            = ["https-443-tcp"]
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 8080
+      to_port     = 8090
+      protocol    = "tcp"
+      description = "Custom ports"
+      cidr_blocks = "10.0.0.0/16"
+    },
+    {
+      rule        = "postgresql-tcp"
+      cidr_blocks = "0.0.0.0/0"
+    },
+  ] 
+}
