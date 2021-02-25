@@ -61,20 +61,21 @@ module "custom_sg" {
 }
 
 
-module "mysql_sg" {
+module "bastion_sg" {
   source = "terraform-aws-modules/security-group/aws"
 
-  name        = "mysql"
-  description = "${var.name} Security group for mysql ports"
+  name        = "bastion"
+  description = "${var.name} Security group for bastion"
   vpc_id      = local.vpc_id
 
   # egress
   egress_rules = ["all-all"]
 
   # ingress
-  # mysql
-  ingress_cidr_blocks = [local.vpc_cidr_block]
-  ingress_rules       = ["mysql-tcp"]
+  # http & https
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_rules       = ["ssh-tcp"]
+  
 }
 
 module "alb_sg" {
@@ -112,29 +113,26 @@ module "was_sg" {
       source_security_group_id = "${module.alb_sg.this_security_group_id}"
     }
   ]
-  
-  number_of_computed_ingress_with_source_security_group_id = 1
   # Number of computed ingress rules to create where 'source_security_group_id' is used
+  number_of_computed_ingress_with_source_security_group_id = 1
 }
 
+module "mysql_sg" {
+  source = "terraform-aws-modules/security-group/aws"
 
+  name        = "mysql"
+  description = "${var.name} Security group for mysql ports"
+  vpc_id      = local.vpc_id
 
-# module "db_computed_source_sg" {
-#   source = "terraform-aws-modules/security-group/aws"
+  # egress
+  egress_rules = ["all-all"]
 
-#   name        = "db_computed_source_sg"
-#   description = "${var.name} Security group for db_computed_source_sg"
+  # ingress
+  # mysql
+  ingress_cidr_blocks = [local.vpc_cidr_block]
+  ingress_rules       = ["mysql-tcp"]
+}
 
-#   vpc_id = local.vpc_id # these are valid values also - "${module.vpc.vpc_id}" and "${local.vpc_id}"
-
-#   computed_ingress_with_source_security_group_id = [
-#     {
-#       rule                     = "mysql-tcp"
-#       source_security_group_id = "${module.web_sg.this_security_group_id}"
-#     }
-#   ]
-#   number_of_computed_ingress_with_source_security_group_id = 1
-# }
 
 # module "db_computed_sg" {
 #   source = "terraform-aws-modules/security-group/aws"
@@ -144,9 +142,7 @@ module "was_sg" {
 
 #   vpc_id = "vpc-04bc8955784f0fa6d" # these are valid values also - "${module.vpc.vpc_id}" and "${local.vpc_id}"
 
-
 #   ingress_cidr_blocks = ["10.0.0.0/16", "${data.aws_security_group.default.id}"]
-
 #   computed_ingress_cidr_blocks           = ["${module.vpc.vpc_cidr_block}"]
 #   number_of_computed_ingress_cidr_blocks = 1
 # }
