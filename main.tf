@@ -35,7 +35,10 @@ module "custom_sg" {
   description = "${var.name} Security group for custom ports"
   vpc_id      = local.vpc_id
 
+  # egress
+  egress_rules = ["all-all"]
 
+  # ingress
   # https
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["https-443-tcp"]
@@ -65,6 +68,10 @@ module "mysql_sg" {
   description = "${var.name} Security group for mysql ports"
   vpc_id      = local.vpc_id
 
+  # egress
+  egress_rules = ["all-all"]
+
+  # ingress
   # mysql
   ingress_cidr_blocks = [local.vpc_cidr_block]
   ingress_rules       = ["mysql-tcp"]
@@ -77,6 +84,10 @@ module "alb_sg" {
   description = "${var.name} Security group for alb"
   vpc_id      = local.vpc_id
 
+  # egress
+  egress_rules = ["all-all"]
+
+  # ingress
   # http & https
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["http-80-tcp", "https-443-tcp"]
@@ -90,10 +101,11 @@ module "was_sg" {
   description = "${var.name} Security group for was"
   vpc_id      = local.vpc_id
 
+  # egress
+  egress_rules = ["all-all"]
+
+  # ingress
   # http
-  # ingress_rules       = ["http-80-tcp"]
-  # ingress_cidr_blocks = ["${module.alb_sg.this_security_group_id}"]
-  
   computed_ingress_with_source_security_group_id = [
     {
       rule                     = "http-80-tcp"
@@ -102,6 +114,7 @@ module "was_sg" {
   ]
   
   number_of_computed_ingress_with_source_security_group_id = 1
+  # Number of computed ingress rules to create where 'source_security_group_id' is used
 }
 
 
