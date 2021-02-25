@@ -83,18 +83,18 @@ module "alb_sg" {
   
 }
 
-module "was_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+# module "was_sg" {
+#   source = "terraform-aws-modules/security-group/aws"
 
-  name        = "was"
-  description = "${var.name} Security group for was"
-  vpc_id      = local.vpc_id
+#   name        = "was"
+#   description = "${var.name} Security group for was"
+#   vpc_id      = local.vpc_id
 
-  # http & https
-  ingress_cidr_blocks = ["${module.alb_sg.this_security_group_id}"]
-  ingress_rules       = ["http-80-tcp"]
+#   # http & https
+#   ingress_cidr_blocks = ["${module.alb_sg.this_security_group_id}"]
+#   ingress_rules       = ["http-80-tcp"]
   
-}
+# }
 
 
 
