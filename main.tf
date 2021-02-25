@@ -9,7 +9,9 @@ module "web_sg" {
 
   name        = "web-server"
   description = "${var.name}'s Security group for web-server with HTTP ports open within VPC"
-  vpc_id      = "${module.vpc.vpc_id}"
+  
+#   vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id      = "vpc-04bc8955784f0fa6d"
 
   ingress_cidr_blocks = ["0.0.0.0/0"]
 
