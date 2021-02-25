@@ -91,7 +91,7 @@ module "was_sg" {
   vpc_id      = local.vpc_id
 
   # http & https
-  ingress_cidr_blocks = ["${module.alb_sg.alb_sg_id}"]
+  ingress_cidr_blocks = ["${module.alb_sg.this_security_group_id}"]
   ingress_rules       = ["http-80-tcp"]
   
 }
