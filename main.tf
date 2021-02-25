@@ -65,27 +65,38 @@ module "mysql_sg" {
   description = "${var.name} Security group for mysql ports"
   vpc_id      = local.vpc_id
 
-
-  # https
-  ingress_cidr_blocks = ["0.0.0.0/0"]
+  # mysql
+  ingress_cidr_blocks = [local.vpc_cidr_block]
   ingress_rules       = ["mysql-tcp"]
-
-
-  # custom port & postgresql
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 8080
-      to_port     = 8090
-      protocol    = "tcp"
-      description = "Custom ports"
-      cidr_blocks = local.vpc_cidr_block
-    },
-    {
-      rule        = "postgresql-tcp"
-      cidr_blocks = local.vpc_cidr_block
-    },
-  ]
 }
+
+module "alb_sg" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = "alb"
+  description = "${var.name} Security group for alb"
+  vpc_id      = local.vpc_id
+
+  # http & https
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_rules       = ["http-80-tcp", "https-443-tcp"]
+  
+}
+
+module "was_sg" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = "was"
+  description = "${var.name} Security group for was"
+  vpc_id      = local.vpc_id
+
+  # http & https
+  ingress_cidr_blocks = ["${module.alb_sg.alb_sg_id}"]
+  ingress_rules       = ["http-80-tcp"]
+  
+}
+
+
 
 # module "db_computed_source_sg" {
 #   source = "terraform-aws-modules/security-group/aws"
