@@ -10,8 +10,8 @@ data "aws_security_group" "default" {
   vpc_id = local.vpc_id
 }
 
-local "vpc_id" {
-  value = "vpc-04bc8955784f0fa6d"
+locals {
+  vpc_id = "vpc-04bc8955784f0fa6d"
 }
 
 module "web_sg" {
