@@ -14,52 +14,6 @@ locals {
   vpc_cidr_block = "10.0.0.0/16"
 }
 
-module "web_sg" {
-  source = "terraform-aws-modules/security-group/aws//modules/http-80"
-  
-  name        = "web-server"
-  description = "${var.name} Security group for web-server"
-
-  #   vpc_id      = "${module.vpc.vpc_id}"
-  vpc_id = local.vpc_id
-
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-
-  tags = var.tags
-}
-
-module "custom_sg" {
-  source = "terraform-aws-modules/security-group/aws"
-
-  name        = "custom"
-  description = "${var.name} Security group for custom ports"
-  vpc_id      = local.vpc_id
-
-  # egress
-  egress_rules = ["all-all"]
-
-  # ingress
-  # https
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["https-443-tcp"]
-
-
-  # custom port & postgresql
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 8080
-      to_port     = 8090
-      protocol    = "tcp"
-      description = "Custom ports"
-      cidr_blocks = local.vpc_cidr_block
-    },
-    {
-      rule        = "postgresql-tcp"
-      cidr_blocks = local.vpc_cidr_block
-    },
-  ]
-}
-
 
 module "bastion_sg" {
   source = "terraform-aws-modules/security-group/aws"
@@ -117,10 +71,10 @@ module "was_sg" {
   number_of_computed_ingress_with_source_security_group_id = 1
 }
 
-module "mysql_sg" {
+module "db_sg" {
   source = "terraform-aws-modules/security-group/aws"
 
-  name        = "mysql"
+  name        = "db-mysql"
   description = "${var.name} Security group for mysql ports"
   vpc_id      = local.vpc_id
 
@@ -132,6 +86,56 @@ module "mysql_sg" {
   ingress_cidr_blocks = [local.vpc_cidr_block]
   ingress_rules       = ["mysql-tcp"]
 }
+
+# custom sample
+module "custom_sg" {
+  source = "terraform-aws-modules/security-group/aws"
+
+  name        = "custom"
+  description = "${var.name} Security group for custom ports"
+  vpc_id      = local.vpc_id
+
+  # egress
+  egress_rules = ["all-all"]
+
+  # ingress
+  # https
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_rules       = ["https-443-tcp"]
+
+
+  # custom port & postgresql
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 8080
+      to_port     = 8090
+      protocol    = "tcp"
+      description = "Custom ports"
+      cidr_blocks = local.vpc_cidr_block
+    },
+    {
+      rule        = "postgresql-tcp"
+      cidr_blocks = local.vpc_cidr_block
+    },
+  ]
+}
+
+
+# etc example ..
+module "web_sg" {
+  source = "terraform-aws-modules/security-group/aws//modules/http-80"
+  
+  name        = "web-server"
+  description = "${var.name} Security group for web-server"
+
+  #   vpc_id      = "${module.vpc.vpc_id}"
+  vpc_id = local.vpc_id
+
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+
+  tags = var.tags
+}
+
 
 
 # module "db_computed_sg" {

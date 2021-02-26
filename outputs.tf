@@ -12,3 +12,20 @@
 
 # this_security_group_vpc_id
 #     Description: The VPC ID
+
+
+output "bastion_security_group_id" {
+    value = module.bastion_sg.this_security_group_id
+}
+
+output "alb_security_group_id" {
+    value = module.alb_sg.this_security_group_id
+}
+
+output "was_security_group_id" {
+    value = module.was_sg.this_security_group_id
+}
+
+output "db_security_group_id" {
+    value = module.db_sg.this_security_group_id
+}
