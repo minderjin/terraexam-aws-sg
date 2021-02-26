@@ -82,7 +82,7 @@ module "was_sg" {
     },
   ]
   # Number of computed ingress rules to create where 'source_security_group_id' is used
-  number_of_computed_ingress_with_source_security_group_id = 1
+  number_of_computed_ingress_with_source_security_group_id = 2
 }
 
 module "db_sg" {
