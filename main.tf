@@ -23,10 +23,7 @@ data "terraform_remote_state" "vpc" {
 locals {
   vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
   vpc_cidr_block = data.terraform_remote_state.vpc.outputs.vpc_cidr_block
-  # vpc_id = "vpc-04bc8955784f0fa6d"
-  # vpc_cidr_block = "10.0.0.0/16"
 }
-
 
 module "bastion_sg" {
   source = "terraform-aws-modules/security-group/aws"
@@ -78,7 +75,11 @@ module "was_sg" {
     {
       rule                     = "http-80-tcp"
       source_security_group_id = "${module.alb_sg.this_security_group_id}"
-    }
+    },
+    {
+      rule                     = "ssh-tcp"
+      source_security_group_id = "${module.bastion_sg.this_security_group_id}"
+    },
   ]
   # Number of computed ingress rules to create where 'source_security_group_id' is used
   number_of_computed_ingress_with_source_security_group_id = 1
