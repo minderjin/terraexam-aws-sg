@@ -9,9 +9,22 @@ data "aws_security_group" "default" {
   vpc_id = local.vpc_id
 }
 
+# Workspace - vpc
+data "terraform_remote_state" "vpc" {
+  backend = "remote"
+  config = {
+    organization = "terraexam"
+    workspaces = {
+      name = "terraexam-aws-vpc"
+    }
+  }
+}
+
 locals {
-  vpc_id = "vpc-04bc8955784f0fa6d"
-  vpc_cidr_block = "10.0.0.0/16"
+  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  vpc_cidr_block = data.terraform_remote_state.vpc.outputs.vpc_cidr_block
+  # vpc_id = "vpc-04bc8955784f0fa6d"
+  # vpc_cidr_block = "10.0.0.0/16"
 }
 
 
