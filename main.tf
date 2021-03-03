@@ -5,7 +5,7 @@ provider "aws" {
 
 data "aws_security_group" "default" {
   name = "default"
-  #   vpc_id = module.vpc.vpc_id
+  # vpc_id = module.vpc.vpc_id
   vpc_id = local.vpc_id
 }
 
@@ -15,62 +15,59 @@ data "terraform_remote_state" "vpc" {
   config = {
     organization = "terraexam"
     workspaces = {
-      name = "terraexam-aws-vpc"
+      name = "terraexam-aws-vpc"  // Your workspace name
     }
   }
 }
 
 locals {
-  vpc_id = data.terraform_remote_state.vpc.outputs.vpc_id
+  # public registry
+  # source = "terraform-aws-modules/security-group/aws"
+  # version = "3.17.0"
+  
+  # private registry
+  source  = "app.terraform.io/terraexam/security-group/aws"
+  version = "1.0.4"
+  
+  vpc_id         = data.terraform_remote_state.vpc.outputs.vpc_id
   vpc_cidr_block = data.terraform_remote_state.vpc.outputs.vpc_cidr_block
 }
 
 module "bastion_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = local.source
+  version = local.version
 
   name        = "bastion"
   description = "${var.name} Security group for bastion"
   vpc_id      = local.vpc_id
 
-  # egress
-  egress_rules = ["all-all"]
-
-  # ingress
-  # http & https
+  egress_rules        = ["all-all"]
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["ssh-tcp"]
-  
 }
 
 module "alb_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = local.source
+  version = local.version
 
   name        = "alb"
   description = "${var.name} Security group for alb"
   vpc_id      = local.vpc_id
 
-  # egress
-  egress_rules = ["all-all"]
-
-  # ingress
-  # http & https
+  egress_rules        = ["all-all"]
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["http-80-tcp", "https-443-tcp"]
-  
 }
 
 module "was_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = local.source
+  version = local.version
 
   name        = "was"
   description = "${var.name} Security group for was"
   vpc_id      = local.vpc_id
 
-  # egress
   egress_rules = ["all-all"]
-
-  # ingress
-  # http
   computed_ingress_with_source_security_group_id = [
     {
       rule                     = "http-80-tcp"
@@ -86,37 +83,30 @@ module "was_sg" {
 }
 
 module "db_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = local.source
+  version = local.version
 
   name        = "db-mysql"
   description = "${var.name} Security group for mysql ports"
   vpc_id      = local.vpc_id
 
-  # egress
-  egress_rules = ["all-all"]
-
-  # ingress
-  # mysql
+  egress_rules        = ["all-all"]
   ingress_cidr_blocks = [local.vpc_cidr_block]
   ingress_rules       = ["mysql-tcp"]
 }
 
 # custom sample
 module "custom_sg" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = local.source
+  version = local.version
 
   name        = "custom"
   description = "${var.name} Security group for custom ports"
   vpc_id      = local.vpc_id
 
-  # egress
-  egress_rules = ["all-all"]
-
-  # ingress
-  # https
+  egress_rules        = ["all-all"]
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["https-443-tcp"]
-
 
   # custom port & postgresql
   ingress_with_cidr_blocks = [
@@ -134,22 +124,20 @@ module "custom_sg" {
   ]
 }
 
-
 # etc example ..
 module "web_sg" {
   source = "terraform-aws-modules/security-group/aws//modules/http-80"
-  
+
   name        = "web-server"
   description = "${var.name} Security group for web-server"
 
-  #   vpc_id      = "${module.vpc.vpc_id}"
+  # vpc_id      = "${module.vpc.vpc_id}"
   vpc_id = local.vpc_id
 
   ingress_cidr_blocks = ["0.0.0.0/0"]
 
   tags = var.tags
 }
-
 
 
 # module "db_computed_sg" {
@@ -171,8 +159,6 @@ module "web_sg" {
 #   computed_ingress_cidr_blocks = ["10.10.0.0/16", "${module.vpc.vpc_cidr_block}"]
 #   number_of_computed_ingress_cidr_blocks = 2
 # }
-
-
 
 
 #####################
