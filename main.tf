@@ -15,25 +15,22 @@ data "terraform_remote_state" "vpc" {
   config = {
     organization = "terraexam"
     workspaces = {
-      name = "terraexam-aws-vpc"  // Your workspace name
+      name = "terraexam-aws-vpc" // Your workspace name
     }
   }
 }
 
 locals {
-  # public registry
-  # module_source = "terraform-aws-modules/security-group/aws"
-  # module_version = "3.17.0"
-  
-  # private registry
-  module_source  = "app.terraform.io/terraexam/security-group/aws"
-  module_version = "1.0.4"
-  
   vpc_id         = data.terraform_remote_state.vpc.outputs.vpc_id
   vpc_cidr_block = data.terraform_remote_state.vpc.outputs.vpc_cidr_block
 }
 
 module "bastion_sg" {
+  ## public registry
+  # source = "terraform-aws-modules/security-group/aws"
+  # version = "3.17.0"
+
+  ## private registry
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
@@ -47,6 +44,11 @@ module "bastion_sg" {
 }
 
 module "alb_sg" {
+  ## public registry
+  # source = "terraform-aws-modules/security-group/aws"
+  # version = "3.17.0"
+
+  ## private registry
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
@@ -60,6 +62,11 @@ module "alb_sg" {
 }
 
 module "was_sg" {
+  ## public registry
+  # source = "terraform-aws-modules/security-group/aws"
+  # version = "3.17.0"
+
+  ## private registry
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
@@ -83,6 +90,11 @@ module "was_sg" {
 }
 
 module "db_sg" {
+  ## public registry
+  # source = "terraform-aws-modules/security-group/aws"
+  # version = "3.17.0"
+
+  ## private registry
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
@@ -97,6 +109,11 @@ module "db_sg" {
 
 # custom sample
 module "custom_sg" {
+  ## public registry
+  # source = "terraform-aws-modules/security-group/aws"
+  # version = "3.17.0"
+
+  ## private registry
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
