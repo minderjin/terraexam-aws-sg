@@ -34,8 +34,8 @@ locals {
 }
 
 module "bastion_sg" {
-  source  = local.module_source
-  version = local.module_version
+  source  = "app.terraform.io/terraexam/security-group/aws"
+  version = "1.0.4"
 
   name        = "bastion"
   description = "${var.name} Security group for bastion"
@@ -47,8 +47,8 @@ module "bastion_sg" {
 }
 
 module "alb_sg" {
-  source  = local.module_source
-  version = local.module_version
+  source  = "app.terraform.io/terraexam/security-group/aws"
+  version = "1.0.4"
 
   name        = "alb"
   description = "${var.name} Security group for alb"
@@ -60,8 +60,8 @@ module "alb_sg" {
 }
 
 module "was_sg" {
-  source  = local.module_source
-  version = local.module_version
+  source  = "app.terraform.io/terraexam/security-group/aws"
+  version = "1.0.4"
 
   name        = "was"
   description = "${var.name} Security group for was"
@@ -83,8 +83,8 @@ module "was_sg" {
 }
 
 module "db_sg" {
-  source  = local.module_source
-  version = local.module_version
+  source  = "app.terraform.io/terraexam/security-group/aws"
+  version = "1.0.4"
 
   name        = "db-mysql"
   description = "${var.name} Security group for mysql ports"
@@ -97,8 +97,8 @@ module "db_sg" {
 
 # custom sample
 module "custom_sg" {
-  source  = local.module_source
-  version = local.module_version
+  source  = "app.terraform.io/terraexam/security-group/aws"
+  version = "1.0.4"
 
   name        = "custom"
   description = "${var.name} Security group for custom ports"
