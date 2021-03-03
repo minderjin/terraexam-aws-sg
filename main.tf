@@ -22,20 +22,20 @@ data "terraform_remote_state" "vpc" {
 
 locals {
   # public registry
-  # source = "terraform-aws-modules/security-group/aws"
-  # version = "3.17.0"
+  # module_source = "terraform-aws-modules/security-group/aws"
+  # module_version = "3.17.0"
   
   # private registry
-  source  = "app.terraform.io/terraexam/security-group/aws"
-  version = "1.0.4"
+  module_source  = "app.terraform.io/terraexam/security-group/aws"
+  module_version = "1.0.4"
   
   vpc_id         = data.terraform_remote_state.vpc.outputs.vpc_id
   vpc_cidr_block = data.terraform_remote_state.vpc.outputs.vpc_cidr_block
 }
 
 module "bastion_sg" {
-  source  = local.source
-  version = local.version
+  source  = local.module_source
+  version = local.module_version
 
   name        = "bastion"
   description = "${var.name} Security group for bastion"
@@ -47,8 +47,8 @@ module "bastion_sg" {
 }
 
 module "alb_sg" {
-  source  = local.source
-  version = local.version
+  source  = local.module_source
+  version = local.module_version
 
   name        = "alb"
   description = "${var.name} Security group for alb"
@@ -60,8 +60,8 @@ module "alb_sg" {
 }
 
 module "was_sg" {
-  source  = local.source
-  version = local.version
+  source  = local.module_source
+  version = local.module_version
 
   name        = "was"
   description = "${var.name} Security group for was"
@@ -83,8 +83,8 @@ module "was_sg" {
 }
 
 module "db_sg" {
-  source  = local.source
-  version = local.version
+  source  = local.module_source
+  version = local.module_version
 
   name        = "db-mysql"
   description = "${var.name} Security group for mysql ports"
@@ -97,8 +97,8 @@ module "db_sg" {
 
 # custom sample
 module "custom_sg" {
-  source  = local.source
-  version = local.version
+  source  = local.module_source
+  version = local.module_version
 
   name        = "custom"
   description = "${var.name} Security group for custom ports"
