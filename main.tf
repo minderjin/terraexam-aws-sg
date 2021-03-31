@@ -34,13 +34,13 @@ module "bastion_sg" {
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
-  name        = "bastion"
+  name        = "${var.name}-bastion"
   description = "${var.name} Security group for bastion"
   vpc_id      = local.vpc_id
 
-  egress_rules        = ["all-all"]
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["ssh-tcp"]
+  egress_rules        = var.bastion_egress_rules
+  ingress_cidr_blocks = var.bastion_ingress_cidr_blocks
+  ingress_rules       = var.bastion_ingress_rules
 }
 
 module "alb_sg" {
@@ -52,13 +52,13 @@ module "alb_sg" {
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
-  name        = "alb"
+  name        = "${var.name}-alb"
   description = "${var.name} Security group for alb"
   vpc_id      = local.vpc_id
 
-  egress_rules        = ["all-all"]
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp", "https-443-tcp"]
+  egress_rules        = var.alb_egress_rules
+  ingress_cidr_blocks = var.alb_ingress_cidr_blocks
+  ingress_rules       = var.alb_ingress_rules
 }
 
 module "was_sg" {
@@ -70,7 +70,7 @@ module "was_sg" {
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
-  name        = "was"
+  name        = "${var.name}-was"
   description = "${var.name} Security group for was"
   vpc_id      = local.vpc_id
 
@@ -78,11 +78,11 @@ module "was_sg" {
   computed_ingress_with_source_security_group_id = [
     {
       rule                     = "http-80-tcp"
-      source_security_group_id = "${module.alb_sg.this_security_group_id}"
+      source_security_group_id = module.alb_sg.this_security_group_id
     },
     {
       rule                     = "ssh-tcp"
-      source_security_group_id = "${module.bastion_sg.this_security_group_id}"
+      source_security_group_id = module.bastion_sg.this_security_group_id
     },
   ]
   # Number of computed ingress rules to create where 'source_security_group_id' is used
@@ -98,13 +98,13 @@ module "db_sg" {
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
-  name        = "db-mysql"
+  name        = "${var.name}-db"
   description = "${var.name} Security group for mysql ports"
   vpc_id      = local.vpc_id
 
-  egress_rules        = ["all-all"]
-  ingress_cidr_blocks = [local.vpc_cidr_block]
-  ingress_rules       = ["mysql-tcp"]
+  egress_rules        = var.db_egress_rules
+  ingress_cidr_blocks = length(var.db_ingress_cidr_blocks) > 0 ? var.db_ingress_cidr_blocks : [local.vpc_cidr_block]
+  ingress_rules       = var.db_ingress_rules
 }
 
 # custom sample
@@ -117,7 +117,7 @@ module "custom_sg" {
   source  = "app.terraform.io/terraexam/security-group/aws"
   version = "1.0.4"
 
-  name        = "custom"
+  name        = "${var.name}-custom"
   description = "${var.name} Security group for custom ports"
   vpc_id      = local.vpc_id
 
@@ -142,19 +142,19 @@ module "custom_sg" {
 }
 
 # etc example ..
-module "web_sg" {
-  source = "terraform-aws-modules/security-group/aws//modules/http-80"
+# module "web_sg" {
+#   source = "terraform-aws-modules/security-group/aws//modules/http-80"
 
-  name        = "web-server"
-  description = "${var.name} Security group for web-server"
+#   name        = "${var.name}-web"
+#   description = "${var.name} Security group for web-server"
 
-  # vpc_id      = "${module.vpc.vpc_id}"
-  vpc_id = local.vpc_id
+#   # vpc_id      = "${module.vpc.vpc_id}"
+#   vpc_id = local.vpc_id
 
-  ingress_cidr_blocks = ["0.0.0.0/0"]
+#   ingress_cidr_blocks = ["0.0.0.0/0"]
 
-  tags = var.tags
-}
+#   tags = var.tags
+# }
 
 
 # module "db_computed_sg" {
